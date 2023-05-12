@@ -134,7 +134,7 @@ class Termuxmpv:
 
     def setupPropertyChanges(self):
         i = 1
-        for prop in ["pause", "metadata", "filename"]:
+        for prop in ["pause", "metadata", "filename", "media-title"]:
             self.sendMessage(["observe_property", i, prop])
             i += 1
 
@@ -188,6 +188,8 @@ class Termuxmpv:
                     self.metadata = message["data"]
                 if message["name"] == "filename":
                     self.filename = message["data"]
+                if message["name"] == "media-title":
+                    self.media_title = message["data"]
                 self.updateNotification()
 
     def updatehook(self):
@@ -212,13 +214,16 @@ class Termuxmpv:
             filename = self.filename
         except AttributeError:
             filename = "None"
-
+        try:
+            media_title = self.media_title
+        except AttributeError:
+            media_title = "None"
         if metadata["title"] != "None":
             title = metadata["title"]
         if metadata["icy-title"] != "None":
             title = metadata["icy-title"]
         else:
-            title = filename
+            title = media_title
         command = [
             "termux-notification",
             "--id",
